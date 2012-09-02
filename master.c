@@ -23,14 +23,14 @@ void motorStep(int nSteps, int direction);
 #pragma code InterruptVectorHigh = 0x08
 void InterruptVectorHigh (void){
   _asm
-    goto InterruptServiceHigh //jump to interrupt routine
+	goto InterruptServiceHigh //jump to interrupt routine
   _endasm
 }
 
 #pragma code InterruptVectorLow = 0x18
 void InterruptVectorLow (void){
   _asm
-    goto InterruptServiceLow //jump to interrupt routine
+	goto InterruptServiceLow //jump to interrupt routine
   _endasm
 }
 
@@ -40,10 +40,10 @@ void main (void){
 
 	while(!OSCCONbits.IOFS);//Wait
 	
-    TRISBbits.TRISB0 = 1; 
-	INTCON2bits.RBPU = 0;		// enable PORTB internal pullups
-    ADCON2 = 0b00111000;
-   	ADCON0 = 0b00000001;
+	TRISBbits.TRISB0 = 1; 
+	INTCON2bits.RBPU = 0;// enable PORTB internal pullups
+	ADCON2 = 0b00111000;
+	ADCON0 = 0b00000001;
 
 	TRISD = 0x00;
 	TRISCbits.TRISC6 = 1;//initializing PORTC
@@ -60,21 +60,21 @@ void main (void){
 	USART_BRGH_LOW, 8); //57.6k baud rate at 32MHz
 
 	//Timer0 config
-    INTCONbits.TMR0IF = 0;// clear roll-over interrupt flag
-    INTCON2bits.TMR0IP = 0;// Timer0 is low priority interrupt
-    INTCONbits.TMR0IE = 1;// enable the Timer0 interrupt.
-    T0CON = 0b01001000;// prescaler 1:1
-    TMR0H = 0;// clear timer - always write upper byte first
-    TMR0L = 23;//32MHz/(4*256-23)
-    T0CONbits.TMR0ON = 0;// start timer	
+	INTCONbits.TMR0IF = 0;// clear roll-over interrupt flag
+	INTCON2bits.TMR0IP = 0;// Timer0 is low priority interrupt
+	INTCONbits.TMR0IE = 1;// enable the Timer0 interrupt.
+	T0CON = 0b01001000;// prescaler 1:1
+	TMR0H = 0;// clear timer - always write upper byte first
+	TMR0L = 23;//32MHz/(4*256-23)
+	T0CONbits.TMR0ON = 0;// start timer	
 
-    INTCON2bits.INTEDG0 = 0;    // interrupt on falling edge of INT0 (switch pressed)
-    INTCONbits.INT0IF = 0;      // ensure flag is cleared
-    INTCONbits.INT0IE = 0;      // disable INT0 interrupt
-	
+	INTCON2bits.INTEDG0 = 0;    // interrupt on falling edge of INT0 (switch pressed)
+	INTCONbits.INT0IF = 0;      // ensure flag is cleared
+	INTCONbits.INT0IE = 0;      // disable INT0 interrupt
+
 	RCONbits.IPEN = 1;// enable priorities on interrups
-    INTCONbits.GIEL = 1;// enable low priority interrupts
-    INTCONbits.GIEH = 1;// enable high priority interrupts
+	INTCONbits.GIEL = 1;// enable low priority interrupts
+	INTCONbits.GIEH = 1;// enable high priority interrupts
 		
 	while(1){
 		//Pulse
@@ -131,24 +131,24 @@ void motorStep(int nSteps, int direction){
 
 #pragma interrupt InterruptServiceHigh  // "interrupt" pragma also for high priority
 void InterruptServiceHigh(void){
-    // Check for INT0 interrupt
+	// Check for INT0 interrupt
 	//waiting = 0;
-    if (INTCONbits.INT0IF){
-        // clear (reset) flag
+	if (INTCONbits.INT0IF){
+		// clear (reset) flag
 		T0CONbits.TMR0ON = 0;//Disable timer
 		waiting = 0;
 		//LATDbits.LATD2 = 1;
-        INTCONbits.INT0IF = 0;
+		INTCONbits.INT0IF = 0;
 		INTCONbits.INT0IE = 0;      
-    }
+	}
 } 
 
 #pragma interruptlow InterruptServiceLow//low priority
 void InterruptServiceLow(void){    
-    if  (INTCONbits.TMR0IF){//Check timer0 Interrupt
+	if  (INTCONbits.TMR0IF){//Check timer0 Interrupt
 		timerCounter++;
 		INTCONbits.TMR0IF = 0;// clear (reset) flag
-        TMR0H = 0;      
-        TMR0L = 23;         
-    }
+		TMR0H = 0;      
+		TMR0L = 23;         
+	}
 }
